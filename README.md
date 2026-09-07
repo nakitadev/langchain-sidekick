@@ -1,6 +1,6 @@
-# 🤖 LangChain Sidekick
+# LangChain Sidekick 🤖
 
-> **Your personal AI co-worker:** A LangChain / LangGraph worker agent wrapped in an evaluator loop, equipped with persistent Model Context Protocol (MCP) browser and filesystem tools, live todo plan tracking, and human-in-the-loop approvals.
+An interactive, production-grade autonomous personal assistant co-worker built with **LangChain**, **LangGraph**, **Gradio**, and **OpenRouter**, equipped with persistent **Model Context Protocol (MCP)** browser & filesystem tools, live plan tracking, and a self-correcting **Evaluator Loop**.
 
 [![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Live%20Demo-blue)](https://huggingface.co/spaces/nakitadev/langchain-sidekick)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
@@ -11,164 +11,182 @@
 
 ---
 
-## 🌐 Live Demo
+## ✨ Features
 
-Try the interactive demo deployed on Hugging Face Spaces:
-- **Hugging Face Space:** [https://huggingface.co/spaces/nakitadev/langchain-sidekick](https://huggingface.co/spaces/nakitadev/langchain-sidekick)
-- **Direct Web App:** [https://nakitadev-langchain-sidekick.static.hf.space](https://nakitadev-langchain-sidekick.static.hf.space)
-
----
-
-## 🌟 Key Features
-
-1. **Layer 3 Worker Agent (`create_agent`)**:
-   - Backed by OpenRouter models (e.g. `openai/gpt-5.4-mini` or `openai/gpt-4o-mini`).
-   - Equipped with real tools: a real headless/headed browser, a sandboxed filesystem, Google Search, and Wikipedia.
-
-2. **Self-Correcting Evaluator Loop**:
-   - The worker's output is checked by a dedicated evaluator agent against the user's explicit **Success Criteria**.
-   - If the criteria are not met, the evaluator provides constructive feedback and re-dispatches the worker for another attempt (up to 3 attempts).
-
-3. **Persistent Model Context Protocol (MCP)**:
-   - **Playwright MCP (`@playwright/mcp`)**: Real browser automation that navigates pages, reads DOM snapshots, and dismisses popups/cookie banners.
-   - **Filesystem MCP (`@modelcontextprotocol/server-filesystem`)**: Safely reads and writes artifacts inside a dedicated `sandbox/` directory.
-   - **Persistent MCP Sessions**: Background stdio processes maintain browser sessions, cookies, and state across multiple tool calls within a turn.
-
-4. **Middleware Protection Stack**:
-   - `TodoListMiddleware`: Generates and shares a structured, live-updating plan with the Gradio UI.
-   - `PIIMiddleware`: Redacts emails and credit card numbers from both prompt inputs and tool outputs.
-   - `ModelCallLimitMiddleware`: Restricts maximum model invocations per turn to prevent runaway token costs.
-   - `TolerateToolErrors`: Traps external tool/network exceptions and feeds them back as messages so the agent can recover gracefully instead of crashing.
-
-5. **Human-in-the-Loop (HIL) Approvals**:
-   - When encountering captchas, 2FA, logins, or sensitive actions, the agent pauses and triggers an approval button in the UI.
+- 💬 **Autonomous Worker Agent (Layer 3)**:
+  - Powered by OpenRouter (`openai/gpt-5.4-mini` or any leading frontier model).
+  - Handles complex multi-step user requests with tool orchestration and planning.
+- 🔄 **Self-Correcting Evaluator Loop**:
+  - Independent evaluator agent inspects candidate answers strictly against user **Success Criteria**.
+  - Generates structured feedback (`success_criteria_met`, `user_input_needed`, `feedback`) and triggers automatic retries (up to 3 attempts).
+- 🛠️ **Persistent Multi-Server MCP Tools**:
+  - **Playwright MCP (`@playwright/mcp`)**: Headless Chromium automation for navigating dynamic web pages, capturing DOM snapshots, and dismissing cookie banners.
+  - **Filesystem MCP (`@modelcontextprotocol/server-filesystem`)**: Sandboxed file read/write operations inside a dedicated `sandbox/` directory.
+  - **Persistent stdio MCP Sessions**: Background asyncio processes keep browser sessions, cookies, and state alive across multi-step turns.
+- 🛡️ **Comprehensive Middleware Protection Stack**:
+  - `TodoListMiddleware`: Maintains a structured todo list synchronized in real time with the UI.
+  - `PIIMiddleware`: Redacts sensitive emails and credit cards from prompts and tool outputs.
+  - `ModelCallLimitMiddleware`: Enforces execution caps to prevent runaway token costs.
+  - `TolerateToolErrors`: Traps external tool exceptions and passes them back as messages so the agent recalibrates gracefully.
+- 🙋 **Human-in-the-Loop (HIL) Supervision**:
+  - Automatically pauses execution when hitting captchas, logins, 2FA, or sensitive decisions, prompting for manual human approval.
+- 🎨 **Modern Responsive UI & Hugging Face Space**:
+  - Native Gradio 6 desktop interface with custom Montserrat typography and brand palette.
+  - Instant zero-setup static web demo hosted on Hugging Face Spaces with interactive simulation presets and direct OpenRouter execution.
 
 ---
 
-## 📐 Architecture Overview
+## 🏗️ Architecture
 
-```mermaid
-flowchart TD
-    User["👤 User (Request + Success Criteria)"] --> Worker["⚡ Layer 3 Worker Agent (create_agent)"]
-    
-    subgraph Middleware ["🛡️ Middleware Stack"]
-        TLM["TodoListMiddleware"]
-        PII["PIIMiddleware"]
-        MCL["ModelCallLimitMiddleware"]
-        TTE["TolerateToolErrors"]
-    end
-    Worker <--> Middleware
-
-    subgraph Tools ["🛠️ Tools & MCP Servers"]
-        PW["🌐 Playwright MCP (Browser)"]
-        FS["📁 Filesystem MCP (sandbox/)"]
-        GS["🔍 Google Serper Search"]
-        WK["📚 Wikipedia API"]
-        PO["📱 Pushover Notification"]
-        HL["🙋 Human Help Pause"]
-    end
-    Worker <--> Tools
-
-    Worker --> Draft["Draft Answer"]
-    Draft --> Evaluator{"⚖️ Evaluator Loop"}
-    
-    Evaluator -- "Deficient (attempts < 3)" --> Feedback["Feedback & Retry"] --> Worker
-    Evaluator -- "Needs Human Input" --> Pause["Pause for User"] --> User
-    Evaluator -- "Criteria Satisfied ✅" --> Final["🎉 Final Answer to User"]
+```text
+                                  ┌───────────────────────────────────────────────┐
+                                  │            User Request & Criteria            │
+                                  │        ("Find flights" + "Under $800")        │
+                                  └───────────────────────┬───────────────────────┘
+                                                          │
+                                                          ▼
+                                  ┌───────────────────────────────────────────────┐
+                                  │      Layer 3 Worker Agent (create_agent)      │
+                                  │           OpenRouter (GPT-5.4-mini)           │
+                                  └───────────────┬───────────────┬───────────────┘
+                                                  │               │
+                         ┌────────────────────────┘               └────────────────────────┐
+                         │                                                                 │
+                         ▼                                                                 ▼
+               ┌──────────────────┐                                              ┌───────────────────┐
+               │ Middleware Stack │                                              │ MCP Server Suite  │
+               ├──────────────────┤                                              ├───────────────────┤
+               │• TodoList plan   │                                              │• Playwright (Web) │
+               │• PII Redaction   │                                              │• Filesystem (Box) │
+               │• Call Limit (30) │                                              │• Google Serper    │
+               │• Error Tolerance │                                              │• Wikipedia Search │
+               └──────────────────┘                                              │• Human Help Pause │
+                                                                                 └─────────┬─────────┘
+                                                                                           │
+                                                  ┌────────────────────────────────────────┘
+                                                  ▼
+                                       ┌─────────────────────┐
+                                       │ Draft Solution Form │
+                                       └──────────┬──────────┘
+                                                  │
+                                                  ▼
+                                       ┌─────────────────────┐
+                                       │   Evaluator Loop    │
+                                       │ (Success Criteria)  │
+                                       └────┬───────────┬────┘
+                                            │           │
+                    ┌───────────────────────┘           └───────────────────────┐
+                    │ (Criteria Met = True)                     (Criteria Met = False)
+                    ▼                                                           ▼
+         ┌─────────────────────┐                                     ┌─────────────────────┐
+         │  Final UI Response  │                                     │ Feedback & Retry 🔄 │
+         │   (Task Complete)   │                                     │ (Up to 3 attempts)  │
+         └─────────────────────┘                                     └─────────────────────┘
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🛠️ Tech Stack
+
+- **Agent Framework**: LangChain 1.3+, LangGraph 1.2+, LangChain Community, Pydantic 2.x
+- **LLM & Inference**: OpenRouter API (`openai/gpt-5.4-mini`, `openai/gpt-4o-mini`, Claude 3.7, Gemini)
+- **Protocols & Tools**: Model Context Protocol (MCP), `@playwright/mcp`, `@modelcontextprotocol/server-filesystem`, Google Serper API, Wikipedia API, Pushover API
+- **Frontend & UI**: Gradio 6, Montserrat typography, Vanilla CSS & JavaScript
+- **Cloud & Deployment**: Hugging Face Spaces (`static` & `gradio`), CloudFront CDN
+- **Package & Runtime**: Python 3.12+, `uv`, Node.js 18+ (`npx`)
+
+---
+
+## 📂 Project Structure
+
+```text
+langchain-sidekick/
+├── app.py               # Gradio UI application and asynchronous event handlers
+├── sidekick.py          # Worker agent, middleware pipeline, and evaluator loop
+├── sidekick_tools.py    # Persistent MCP sessions (Playwright, Filesystem) & tool definitions
+├── styles.py            # Custom brand themes, CSS injection, and layout styles
+├── pyproject.toml       # Modern Python packaging configuration (uv)
+├── requirements.txt     # Standard pip dependencies
+├── sandbox/             # Persistent filesystem directory managed by Filesystem MCP
+└── hf_space/            # Hugging Face Space interactive deployment assets
+    ├── index.html       # Standalone client-side studio interface
+    ├── style.css        # Custom responsive design system matching Sidekick theme
+    ├── app.js           # Client-side agent simulation engine and OpenRouter API bridge
+    └── README.md        # Hugging Face Space metadata card & documentation
+```
+
+---
+
+## 🚀 Getting Started (Local Development)
 
 ### Prerequisites
-- **Python 3.12+**
-- **Node.js 18+** & `npx` (required for running `@playwright/mcp` and `@modelcontextprotocol/server-filesystem`)
-- (Recommended) [uv](https://docs.astral.sh/uv/) package manager
 
----
+- [Python](https://www.python.org/) (3.12+) & [`uv`](https://docs.astral.sh/uv/) (recommended)
+- [Node.js](https://nodejs.org/) (v18+) & `npx` (required for running MCP servers)
 
-### Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/nakitadev/langchain-sidekick.git
-   cd langchain-sidekick
-   ```
-
-2. **Install dependencies:**
-   Using `uv` (recommended):
-   ```bash
-   uv sync
-   ```
-   Or using standard `pip`:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements.txt
-   ```
-
-3. **Configure Environment Variables:**
-   Copy the example environment file:
-   ```bash
-   cp .env.example .env
-   ```
-   Edit `.env` and fill in your keys:
-   ```env
-   OPENROUTER_API_KEY=your_openrouter_api_key   # Required (openrouter.ai)
-   SERPER_API_KEY=your_google_serper_api_key   # Required for web search (serper.dev)
-   PUSHOVER_TOKEN=your_pushover_app_token       # Optional (pushover.net)
-   PUSHOVER_USER=your_pushover_user_key         # Optional (pushover.net)
-   ```
-
----
-
-## 💻 Running the Application
-
-Start the local Gradio interface:
+### 1. Clone Repository
 
 ```bash
+git clone https://github.com/nakitadev/langchain-sidekick.git
+cd langchain-sidekick
+```
+
+### 2. Configure Environment
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your API keys:
+```env
+OPENROUTER_API_KEY=sk-or-v1-...
+SERPER_API_KEY=your_google_serper_key
+PUSHOVER_TOKEN=your_pushover_token      # Optional
+PUSHOVER_USER=your_pushover_user        # Optional
+```
+
+### 3. Install Dependencies & Run
+
+Using `uv`:
+```bash
+uv sync
 uv run app.py
 ```
-*(or `python app.py`)*
 
-The web UI will launch in your default browser at `http://localhost:7860`:
-1. Enter your **Request** (e.g. *"Find roundtrip flights from NYC to London departing July 14 returning July 21"*).
-2. Enter your **Success Criteria** (e.g. *"List 3 airline options with times and prices strictly under $800"*).
-3. Click **Go!** and watch the Sidekick plan, execute tools, and verify its response in real time.
+Or using standard `pip`:
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python app.py
+```
+
+Open [http://localhost:7860](http://localhost:7860) in your browser.
 
 ---
 
-## 📁 Repository Structure
+## ☁️ Deployment (Hugging Face Spaces)
 
-```
-.
-├── app.py               # Gradio UI entrypoint and async event handlers
-├── sidekick.py          # Worker agent, middleware stack, and evaluator loop
-├── sidekick_tools.py    # MCP connections (Playwright, Filesystem) and standard tools
-├── styles.py            # Brand styling, themes, and CSS for the Gradio app
-├── pyproject.toml       # Project metadata and dependencies
-├── requirements.txt     # Standard pip dependency requirements
-├── sandbox/             # Dedicated persistent sandbox directory for file tools
-└── hf_space/            # Hugging Face Space interactive deployment assets
-    ├── index.html       # Standalone interactive web client
-    ├── style.css        # Responsive styling system matching the Sidekick brand
-    ├── app.js           # Client-side agent simulation, preset scenarios, and OpenRouter runner
-    └── README.md        # Hugging Face Space card configuration and metadata
-```
+### Live Demo URLs
 
----
+- **Hugging Face Space Hub**: [https://huggingface.co/spaces/nakitadev/langchain-sidekick](https://huggingface.co/spaces/nakitadev/langchain-sidekick)
+- **Direct Web App**: [https://nakitadev-langchain-sidekick.static.hf.space](https://nakitadev-langchain-sidekick.static.hf.space)
 
-## ☁️ Hugging Face Space Deployment
-
-The `hf_space/` directory contains the build for the live Hugging Face Space. To sync local changes with the Space:
+### Push Updates to Hugging Face Space
 
 ```bash
-hf upload nakitadev/langchain-sidekick hf_space . --repo-type space --exclude "**/__pycache__/**"
+hf upload nakitadev/langchain-sidekick hf_space . --repo-type space --exclude "**/__pycache__/**" --commit-message "Update Space demo"
 ```
+
+### Upgrading to ZeroGPU / Paid Compute
+
+To run the full backend Python container on Hugging Face compute:
+1. Update `sdk: gradio` in [`hf_space/README.md`](hf_space/README.md) frontmatter.
+2. Configure `OPENROUTER_API_KEY` and other secrets in **Space Settings → Variables and secrets**.
+3. Re-upload to automatically build the Python Gradio container.
 
 ---
 
-## 📜 License
+## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the terms of the [LICENSE](LICENSE) file.
