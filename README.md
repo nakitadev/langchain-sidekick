@@ -40,6 +40,10 @@ An interactive, production-grade autonomous personal assistant co-worker built w
 
 ## 🏗️ Architecture
 
+![LangChain Sidekick Agent Workflow](./langchain-sidekick-agent-workflow.png)
+
+> 💡 **Interactive Archify Diagram:** Explore the live compiled [Archify Interactive Workflow Diagram](sidekick-workflow.html) (also accessible on [Hugging Face Space](https://nakitadev-langchain-sidekick.static.hf.space/sidekick-workflow.html)) featuring light/dark themes, route tracing, and deep inspection.
+
 ```text
                                   ┌───────────────────────────────────────────────┐
                                   │            User Request & Criteria            │
