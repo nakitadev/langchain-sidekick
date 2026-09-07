@@ -158,23 +158,25 @@ Open [http://localhost:7860](http://localhost:7860) in your browser.
 
 ## ☁️ Deployment (Hugging Face Spaces)
 
+An interactive live demonstration of this agent is hosted on Hugging Face Spaces.
+
 ### Live Demo URLs
 
 - **Hugging Face Space Hub**: [https://huggingface.co/spaces/nakitadev/langchain-sidekick](https://huggingface.co/spaces/nakitadev/langchain-sidekick)
 - **Direct Web App**: [https://nakitadev-langchain-sidekick.static.hf.space](https://nakitadev-langchain-sidekick.static.hf.space)
 
-### Push Updates to Hugging Face Space
+### Deploying to Hugging Face Spaces
 
-```bash
-hf upload nakitadev/langchain-sidekick hf_space . --repo-type space --exclude "**/__pycache__/**" --commit-message "Update Space demo"
-```
-
-### Upgrading to ZeroGPU / Paid Compute
-
-To run the full backend Python container on Hugging Face compute:
-1. Update `sdk: gradio` in [`hf_space/README.md`](hf_space/README.md) frontmatter.
-2. Configure `OPENROUTER_API_KEY` and other secrets in **Space Settings → Variables and secrets**.
-3. Re-upload to automatically build the Python Gradio container.
+To deploy this repository to Hugging Face Spaces:
+1. Create a Space with Gradio SDK:
+   ```bash
+   hf repos create nakitadev/langchain-sidekick --type space --space-sdk gradio
+   ```
+2. Configure `OPENROUTER_API_KEY` and optional tools in **Space Settings → Variables and secrets**.
+3. Push the project code directly to the Space:
+   ```bash
+   hf upload nakitadev/langchain-sidekick . . --repo-type space --exclude "**/__pycache__/**"
+   ```
 
 ---
 
