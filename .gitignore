@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 sandbox/*
 !sandbox/.gitkeep
+hf_space/

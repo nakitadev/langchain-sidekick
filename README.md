@@ -9,6 +9,8 @@ An interactive, production-grade autonomous personal assistant co-worker built w
 [![Gradio](https://img.shields.io/badge/Gradio-6.14+-orange.svg)](https://gradio.app/)
 [![MCP](https://img.shields.io/badge/MCP-Playwright%20%26%20Filesystem-blueviolet.svg)](https://modelcontextprotocol.io/)
 
+![LangChain Sidekick Agent Workflow](./langchain-sidekick-agent-workflow.png)
+
 ---
 
 ## ✨ Features
@@ -101,18 +103,16 @@ An interactive, production-grade autonomous personal assistant co-worker built w
 
 ```text
 langchain-sidekick/
-├── app.py               # Gradio UI application and asynchronous event handlers
-├── sidekick.py          # Worker agent, middleware pipeline, and evaluator loop
-├── sidekick_tools.py    # Persistent MCP sessions (Playwright, Filesystem) & tool definitions
-├── styles.py            # Custom brand themes, CSS injection, and layout styles
-├── pyproject.toml       # Modern Python packaging configuration (uv)
-├── requirements.txt     # Standard pip dependencies
-├── sandbox/             # Persistent filesystem directory managed by Filesystem MCP
-└── hf_space/            # Hugging Face Space interactive deployment assets
-    ├── index.html       # Standalone client-side studio interface
-    ├── style.css        # Custom responsive design system matching Sidekick theme
-    ├── app.js           # Client-side agent simulation engine and OpenRouter API bridge
-    └── README.md        # Hugging Face Space metadata card & documentation
+├── app.py                            # Gradio UI application and asynchronous event handlers
+├── sidekick.py                       # Worker agent, middleware pipeline, and evaluator loop
+├── sidekick_tools.py                 # Persistent MCP sessions (Playwright, Filesystem) & tool definitions
+├── styles.py                         # Custom brand themes, CSS injection, and layout styles
+├── pyproject.toml                    # Modern Python packaging configuration (uv)
+├── requirements.txt                  # Standard pip dependencies
+├── sandbox/                          # Persistent filesystem directory managed by Filesystem MCP
+├── sidekick-workflow.html            # Compiled interactive Archify system workflow diagram
+├── sidekick-workflow.json            # Archify typed intermediate representation (JSON IR)
+└── langchain-sidekick-agent-workflow.png  # Visual architecture diagram
 ```
 
 ---
