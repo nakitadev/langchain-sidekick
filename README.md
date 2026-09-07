@@ -9,6 +9,8 @@ An interactive, production-grade autonomous personal assistant co-worker built w
 [![Gradio](https://img.shields.io/badge/Gradio-6.14+-orange.svg)](https://gradio.app/)
 [![MCP](https://img.shields.io/badge/MCP-Playwright%20%26%20Filesystem-blueviolet.svg)](https://modelcontextprotocol.io/)
 
+![LangChain Sidekick Agent Workflow](./langchain-sidekick-agent-workflow.png)
+
 ---
 
 ## ✨ Features
@@ -37,8 +39,6 @@ An interactive, production-grade autonomous personal assistant co-worker built w
 ---
 
 ## 🏗️ Architecture
-
-![LangChain Sidekick Agent Workflow](./langchain-sidekick-agent-workflow.png)
 
 ```text
                                   ┌───────────────────────────────────────────────┐
