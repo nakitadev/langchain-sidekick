@@ -2,13 +2,6 @@
 
 An interactive, production-grade autonomous personal assistant co-worker built with **LangChain**, **LangGraph**, **Gradio**, and **OpenRouter**, equipped with persistent **Model Context Protocol (MCP)** browser & filesystem tools, live plan tracking, and a self-correcting **Evaluator Loop**.
 
-[![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Live%20Demo-blue)](https://huggingface.co/spaces/nakitadev/langchain-sidekick)
-[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
-[![LangChain](https://img.shields.io/badge/LangChain-1.3+-green.svg)](https://github.com/langchain-ai/langchain)
-[![LangGraph](https://img.shields.io/badge/LangGraph-1.2+-purple.svg)](https://github.com/langchain-ai/langgraph)
-[![Gradio](https://img.shields.io/badge/Gradio-6.14+-orange.svg)](https://gradio.app/)
-[![MCP](https://img.shields.io/badge/MCP-Playwright%20%26%20Filesystem-blueviolet.svg)](https://modelcontextprotocol.io/)
-
 ![LangChain Sidekick Agent Workflow](./langchain-sidekick-agent-workflow.png)
 
 ---
