@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "LangChain Sidekick Agent Workflow",
+    "animation": "trace",
+    "visual_preset": "signal-flow",
+    "quality_profile": "standard",
+    "views": [
+      {
+        "id": "happy-path",
+        "label": "Full Task to Verified Result",
+        "focus": ["user_prompt", "gradio_ui", "worker", "todo_plan", "approval_gate", "mcp_suite", "evaluator", "final_response"],
+        "note": "Follow standard request from prompt submission through MCP tool calls to final evaluator signoff."
+      },
+      {
+        "id": "evaluator-loop",
+        "label": "Self-Correction & Evaluator Loop",
+        "focus": ["worker", "evaluator", "retry_path"],
+        "note": "Inspect how the Evaluator checks criteria and routes deficient drafts to retry."
+      },
+      {
+        "id": "safety-and-hil",
+        "label": "Human-in-the-Loop & Policy Gate",
+        "focus": ["worker", "todo_plan", "approval_gate", "blocked_pause"],
+        "note": "Trace execution pauses for 2FA, logins, and human approval."
+      },
+      {
+        "id": "mcp-tools",
+        "label": "Multi-Server MCP Infrastructure",
+        "focus": ["approval_gate", "mcp_suite", "evaluator"],
+        "note": "Examine persistent stdio sessions powering browser and sandbox operations."
+      }
+    ],
+    "output": "sidekick-workflow.html"
+  },
+  "lanes": [
+    { "id": "ui", "label": "User Interface" },
+    { "id": "agent", "label": "Agent Core (LangChain & LangGraph)" },
+    { "id": "policy", "label": "Policy & Human Guardrails", "variant": "exception" },
+    { "id": "tools", "label": "Tools & MCP Subsystems" }
+  ],
+  "phases": [
+    { "id": "phase_intake", "label": "Intake & Plan", "fromCol": 0, "toCol": 1 },
+    { "id": "phase_reason", "label": "Reasoning & Policy", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "phase_exec", "label": "Execution & Tool Calling", "fromCol": 4, "toCol": 4, "variant": "dashed" },
+    { "id": "phase_eval", "label": "Evaluator Audit & Resolution", "fromCol": 5, "toCol": 5, "variant": "emphasis" }
+  ],
+  "groups": [
+    { "id": "grp_worker", "label": "Worker reasoning loop", "lane": "agent", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "grp_policy", "label": "Policy approval", "lane": "policy", "fromCol": 3, "toCol": 4, "variant": "security" },
+    { "id": "grp_mcp", "label": "Model Context Protocol (stdio)", "lane": "tools", "fromCol": 4, "toCol": 4, "variant": "dashed" }
+  ],
+  "mainPath": ["user_prompt", "gradio_ui", "worker", "todo_plan", "approval_gate", "mcp_suite", "evaluator", "final_response"],
+  "nodes": [
+    { "id": "user_prompt", "lane": "ui", "col": 0, "type": "external", "label": "User Request", "sublabel": "task + success criteria", "width": 132 },
+    { "id": "gradio_ui", "lane": "ui", "col": 1, "type": "frontend", "label": "Gradio UI", "sublabel": "chat + live plan panel", "width": 132 },
+    { "id": "final_response", "lane": "ui", "col": 5, "type": "backend", "label": "Final Output", "sublabel": "criteria satisfied", "tag": "deliver to user", "width": 132 },
+    
+    { "id": "worker", "lane": "agent", "col": 2, "type": "backend", "label": "Worker Agent", "sublabel": "create_agent (GPT-5.4-mini)", "tag": "Layer 3 Worker", "width": 132 },
+    { "id": "todo_plan", "lane": "agent", "col": 3, "type": "messagebus", "label": "TodoList Engine", "sublabel": "dynamic plan state", "tag": "1s timer sync", "width": 132 },
+    { "id": "evaluator", "lane": "agent", "col": 5, "type": "backend", "label": "Evaluator Agent", "sublabel": "audits success criteria", "tag": "Pydantic schema", "width": 132 },
+
+    { "id": "approval_gate", "lane": "policy", "col": 3, "type": "security", "label": "Approval Gate", "sublabel": "captchas & 2FA pauses", "tag": "Approve in UI", "width": 132 },
+    { "id": "blocked_pause", "lane": "policy", "col": 4, "type": "security", "label": "Human Pause", "sublabel": "wait for user click", "tag": "HIL Gateway", "width": 132 },
+    { "id": "retry_path", "lane": "policy", "col": 5, "type": "messagebus", "label": "Retry Loop", "sublabel": "feedback + decrement budget", "tag": "max 3 attempts", "width": 132 },
+
+    { "id": "mcp_suite", "lane": "tools", "col": 4, "type": "cloud", "label": "MCP Tool Suite", "sublabel": "Playwright + Sandbox FS", "tag": "MultiServerMCPClient", "width": 132 }
+  ],
+  "edges": [
+    { "id": "e_prompt", "from": "user_prompt", "to": "gradio_ui", "variant": "default" },
+    { "id": "e_dispatch", "from": "gradio_ui", "to": "worker", "label": "run_turn()", "variant": "emphasis" },
+    { "id": "e_plan", "from": "worker", "to": "todo_plan", "label": "plan next step", "variant": "default" },
+    { "id": "e_gate_check", "from": "todo_plan", "to": "approval_gate", "label": "policy check", "variant": "security" },
+    { "id": "e_gate_blocked", "from": "approval_gate", "to": "blocked_pause", "label": "needs 2FA", "variant": "security", "role": "branch" },
+    { "id": "e_gate_approved", "from": "approval_gate", "to": "mcp_suite", "label": "approved", "variant": "emphasis" },
+    { "id": "e_tool_eval", "from": "mcp_suite", "to": "evaluator", "label": "candidate draft", "variant": "emphasis" },
+    { "id": "e_eval_pass", "from": "evaluator", "to": "final_response", "label": "criteria met", "variant": "emphasis" },
+    { "id": "e_eval_fail", "from": "evaluator", "to": "retry_path", "label": "criteria not met", "variant": "security", "role": "error" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Dual-Agent Coordination",
+      "items": [
+        "Layer 3 Worker is decoupled from evaluation criteria",
+        "Evaluator enforces strict validation before user delivery"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Persistent MCP Infrastructure",
+      "items": [
+        "Playwright stdio session keeps cookies and DOM state alive",
+        "Filesystem MCP confines file mutations strictly to sandbox/"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Resilience & Guardrails",
+      "items": [
+        "PII redaction cleans sensitive inputs and tool results",
+        "TolerateToolErrors prevents browser timeouts from crashing run"
+      ]
+    }
+  ]
+}
