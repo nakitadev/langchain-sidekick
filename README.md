@@ -42,8 +42,6 @@ An interactive, production-grade autonomous personal assistant co-worker built w
 
 ![LangChain Sidekick Agent Workflow](./langchain-sidekick-agent-workflow.png)
 
-> 💡 **Interactive Archify Diagram:** Explore the live compiled [Archify Interactive Workflow Diagram](sidekick-workflow.html) (also accessible on [Hugging Face Space](https://nakitadev-langchain-sidekick.static.hf.space/sidekick-workflow.html)) featuring light/dark themes, route tracing, and deep inspection.
-
 ```text
                                   ┌───────────────────────────────────────────────┐
                                   │            User Request & Criteria            │
@@ -114,8 +112,6 @@ langchain-sidekick/
 ├── pyproject.toml                    # Modern Python packaging configuration (uv)
 ├── requirements.txt                  # Standard pip dependencies
 ├── sandbox/                          # Persistent filesystem directory managed by Filesystem MCP
-├── sidekick-workflow.html            # Compiled interactive Archify system workflow diagram
-├── sidekick-workflow.json            # Archify typed intermediate representation (JSON IR)
 └── langchain-sidekick-agent-workflow.png  # Visual architecture diagram
 ```
 
